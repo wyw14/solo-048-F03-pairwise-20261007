@@ -80,6 +80,34 @@ func (s *Series) At(stationID string, kind Kind, watermark uint64) (Sample, bool
 	return items[index], true
 }
 
+func (s *Series) StationIDs() []string {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	ids := make([]string, 0, len(s.samples))
+	for stationID := range s.samples {
+		ids = append(ids, stationID)
+	}
+	sort.Strings(ids)
+	return ids
+}
+
+// CopyStation returns a deep copy of one station's series. Query code works on
+// the copy so samples arriving afterwards can never mutate an in-flight or
+// already returned result.
+func (s *Series) CopyStation(stationID string) map[Kind][]Sample {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	kinds := s.samples[stationID]
+	if kinds == nil {
+		return map[Kind][]Sample{}
+	}
+	copyByKind := make(map[Kind][]Sample, len(kinds))
+	for kind, items := range kinds {
+		copyByKind[kind] = append([]Sample(nil), items...)
+	}
+	return copyByKind
+}
+
 func (s *Series) Watermarks(stationID string, kinds []Kind) []uint64 {
 	s.mu.RLock()
 	defer s.mu.RUnlock()

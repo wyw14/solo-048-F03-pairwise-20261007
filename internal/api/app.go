@@ -40,6 +40,7 @@ type App struct {
 	Boundaries           *valve.BoundaryService
 	Primary              *valve.PrimaryService
 	Telemetry            *telemetry.Series
+	TelemetryQuery       *telemetry.Query
 	SnapshotsBuilder     *telemetry.SnapshotBuilder
 	FlowReceipts         *telemetry.FlowReceipts
 	Balancer             *hydraulic.Balancer
@@ -126,6 +127,7 @@ func NewApp(dataDirectory string) (*App, error) {
 		Manual: station.NewManualService(valveOperations), Maintenance: station.NewMaintenanceService(stations, snapshots),
 	}
 	app.SnapshotsBuilder = telemetry.NewSnapshotBuilder(app.Telemetry)
+	app.TelemetryQuery = telemetry.NewQuery(app.Telemetry)
 	app.LeakProtection = protection.NewLeakProtection(app.LeakDetector)
 	app.ExchangerSwitch = exchanger.NewSwitchService(stations, flowReceipts, primary)
 	app.Publisher = dispatch.NewPublisher(planner, targets, recorder)
