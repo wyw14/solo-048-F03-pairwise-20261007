@@ -38,6 +38,7 @@ func (a *App) Handler() http.Handler {
 		api.Delete("/stations/{stationID}/latches", a.resetLatches)
 		api.Post("/stations/{stationID}/reconnect", a.reconnectStation)
 		api.Post("/telemetry", a.recordTelemetry)
+		api.Get("/telemetry/alignment", a.queryAlignment)
 		api.Post("/stations/{stationID}/hydraulic/evaluate", a.evaluateHydraulic)
 		api.Get("/incidents", a.listIncidents)
 		api.Delete("/incidents/{incidentID}", a.resolveIncident)
